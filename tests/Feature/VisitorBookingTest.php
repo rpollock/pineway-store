@@ -28,6 +28,26 @@ class VisitorBookingTest extends TestCase
             ->assertSee('£80');
     }
 
+    public function test_the_book_page_returns_json_for_the_selected_day(): void
+    {
+        $course = $this->course();
+        $date = now()->next(Carbon::SATURDAY)->toDateString();
+
+        $this->getJson('/book?date='.$date.'&course='.$course->id)
+            ->assertOk()
+            ->assertJsonPath('selected', $date)
+            ->assertJsonPath('courseId', $course->id)
+            ->assertJsonPath('dayRate', '£80')
+            ->assertJsonStructure([
+                'selected',
+                'courseId',
+                'monthLabel',
+                'dayRate',
+                'dayRateLabel',
+                'slots',
+            ]);
+    }
+
     public function test_a_visitor_can_hold_and_check_out_a_tee_time(): void
     {
         $course = $this->course();

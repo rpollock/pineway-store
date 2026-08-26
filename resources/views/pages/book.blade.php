@@ -6,7 +6,7 @@
         <h1 class="mt-3 font-serif text-5xl">Book a tee time</h1>
         <p class="mt-4 max-w-2xl text-ink/65">
             Choose a day and a time on the Championship or Valley course.
-            Green fees are {{ \App\Support\GreenFees::format($dayRate) }} today ({{ strtolower($dayRateLabel) }}), payable at the professional’s shop.
+            Green fees are <span class="js-book-rate">{{ \App\Support\GreenFees::format($dayRate) }}</span> on this day (<span class="js-book-rate-label">{{ strtolower($dayRateLabel) }}</span>), payable at the professional’s shop.
         </p>
     </section>
 
@@ -30,20 +30,28 @@
     @if ($courses->isEmpty())
         <div class="card-frame mb-10 p-8 text-ink/70">The tee sheet is being prepared. Please telephone the clubhouse on +44 (0) 1924 258778.</div>
     @else
+        <div
+            class="js-book-sheet"
+            data-date="{{ $selected }}"
+            data-course="{{ $courseId }}"
+            data-url="{{ route('book') }}"
+        >
         <div class="mb-4 flex flex-wrap gap-2">
             @foreach ($courses as $course)
                 <a
                     href="{{ route('book', ['date' => $selected, 'course' => $course->id]) }}"
-                    class="{{ (int) $courseId === (int) $course->id ? 'btn-ink' : 'btn-ghost' }}"
+                    class="js-book-course-tab {{ (int) $courseId === (int) $course->id ? 'btn-ink' : 'btn-ghost' }}"
+                    data-course="{{ $course->id }}"
                 >{{ $course->name }}</a>
             @endforeach
         </div>
 
-        <div class="mb-6 flex gap-2 overflow-x-auto pb-1">
+        <div class="js-book-days mb-6 flex gap-2 overflow-x-auto pb-1">
             @foreach ($days as $day)
                 <a
                     href="{{ route('book', ['date' => $day['date'], 'course' => $courseId]) }}"
-                    class="flex min-w-[4.4rem] flex-col items-center rounded-2xl px-3 py-3 text-center {{ $selected === $day['date'] ? 'bg-ink text-paper' : 'bg-cream text-ink hover:bg-cream/70' }}"
+                    class="js-book-day flex min-w-[4.4rem] flex-col items-center rounded-2xl px-3 py-3 text-center {{ $selected === $day['date'] ? 'bg-ink text-paper' : 'bg-cream text-ink hover:bg-cream/70' }}"
+                    data-date="{{ $day['date'] }}"
                 >
                     <span class="text-[10px] font-medium uppercase tracking-[0.16em] opacity-70">{{ $day['label'] }}</span>
                     <span class="mt-1 font-serif text-2xl leading-none">{{ $day['day'] }}</span>
@@ -52,14 +60,14 @@
             @endforeach
         </div>
 
-        <p class="mb-4 text-sm text-ink/55">{{ $monthLabel }}</p>
+        <p class="js-book-month mb-4 text-sm text-ink/55">{{ $monthLabel }}</p>
 
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div class="js-book-slots grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
             @forelse ($slots as $slot)
                 @if ($slot['available'])
                     <button
                         type="button"
-                        class="js-pick-slot card-frame p-5 text-left transition hover:bg-[#ebe6d8]"
+                        class="js-pick-slot card-frame p-3 text-left transition hover:bg-[#ebe6d8] sm:p-5"
                         data-course-id="{{ $slot['course_id'] }}"
                         data-course="{{ $slot['course'] }}"
                         data-date="{{ $selected }}"
@@ -70,17 +78,18 @@
                         data-rate-label="{{ $slot['rate_label'] }}"
                         data-fourball="{{ $slot['fourball'] ?? '' }}"
                     >
-                        <p class="font-serif text-3xl">{{ $slot['time'] }}</p>
-                        <p class="mt-2 font-serif text-xl text-ink/80">{{ $slot['price_label'] }}</p>
-                        <p class="mt-1 text-[12px] uppercase tracking-[0.14em] text-ink/50">
-                            {{ $slot['rate_label'] }} · {{ $slot['spots'] }} {{ $slot['spots'] === 1 ? 'spot' : 'spots' }} left
+                        <p class="font-serif text-2xl sm:text-3xl">{{ $slot['time'] }}</p>
+                        <p class="mt-1 font-serif text-lg text-ink/80 sm:mt-2 sm:text-xl">{{ $slot['price_label'] }}</p>
+                        <p class="mt-1 text-[10px] uppercase leading-snug tracking-[0.1em] text-ink/50 sm:text-[12px] sm:tracking-[0.14em]">
+                            <span class="sm:hidden">{{ $slot['spots'] }} {{ $slot['spots'] === 1 ? 'spot' : 'spots' }}</span>
+                            <span class="hidden sm:inline">{{ $slot['rate_label'] }} · {{ $slot['spots'] }} {{ $slot['spots'] === 1 ? 'spot' : 'spots' }} left</span>
                         </p>
                     </button>
                 @else
-                    <div class="rounded-[1.5rem] border border-ink/8 bg-paper px-5 py-5 text-ink/35">
-                        <p class="font-serif text-3xl">{{ $slot['time'] }}</p>
-                        <p class="mt-2 font-serif text-xl">{{ $slot['price_label'] }}</p>
-                        <p class="mt-1 text-[12px] uppercase tracking-[0.14em]">Full</p>
+                    <div class="rounded-[1.5rem] border border-ink/8 bg-paper px-3 py-3 text-ink/35 sm:px-5 sm:py-5">
+                        <p class="font-serif text-2xl sm:text-3xl">{{ $slot['time'] }}</p>
+                        <p class="mt-1 font-serif text-lg sm:mt-2 sm:text-xl">{{ $slot['price_label'] }}</p>
+                        <p class="mt-1 text-[10px] uppercase tracking-[0.1em] sm:text-[12px] sm:tracking-[0.14em]">Full</p>
                     </div>
                 @endif
             @empty
@@ -88,6 +97,7 @@
                     No visitor times left on this day. Try another date, or telephone the clubhouse.
                 </div>
             @endforelse
+        </div>
         </div>
     @endif
 

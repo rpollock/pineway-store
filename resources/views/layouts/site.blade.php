@@ -11,9 +11,9 @@
     </head>
     <body class="min-h-screen bg-white text-ink antialiased">
         <header class="js-site-header site-header sticky top-0 z-40 bg-white">
-            <div class="page-shell flex items-center justify-between gap-6 py-4">
-                <a href="{{ route('home') }}" class="group flex items-center gap-3">
-                    <img src="{{ asset('images/mark.svg') }}" alt="" class="h-10 w-10 rounded-xl">
+            <div class="page-shell flex items-center justify-between gap-3 pt-4 pb-6 sm:gap-6 sm:py-4">
+                <a href="{{ route('home') }}" class="group flex min-w-0 items-center gap-3">
+                    <img src="{{ asset('images/mark.svg') }}" alt="" class="h-10 w-10 shrink-0 rounded-xl">
                     <span class="leading-tight">
                         <span class="block font-serif text-lg tracking-tight text-ink">Wakefield</span>
                         <span class="block text-[10px] font-medium uppercase tracking-[0.28em] text-gold">Golf Club · Est. 1891</span>
@@ -36,9 +36,12 @@
                         @endforeach
                     </nav>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                         @unless (request()->routeIs('book') || request()->routeIs('book.*'))
-                            <a href="{{ route('book') }}" class="btn-ink !px-4 !py-2.5">Book a tee time</a>
+                            <a href="{{ route('book') }}" class="btn-ink header-book">
+                                <span class="sm:hidden">Book</span>
+                                <span class="hidden sm:inline">Book a tee time</span>
+                            </a>
                         @endunless
                     <button type="button" class="js-nav-toggle inline-flex h-10 w-10 items-center justify-center rounded-full border border-ink/15 text-ink lg:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
                     <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -49,20 +52,22 @@
                 </div>
 
             <nav id="mobile-nav" class="js-mobile-nav mobile-nav page-shell lg:hidden">
-                <div class="flex flex-col gap-3 rounded-2xl bg-cream px-5 py-4 text-sm font-medium uppercase tracking-[0.16em]">
-                    <a href="{{ route('home') }}">Overview</a>
-                    <a href="{{ route('course') }}">The Course</a>
-                    <a href="{{ route('club') }}">The Club</a>
-                    <a href="{{ route('visit') }}">Visit</a>
-                    <a href="{{ route('gallery') }}">Gallery</a>
-                    <a href="{{ route('contact') }}">Contact</a>
-                    <a href="{{ route('book') }}" class="btn-ink mt-2 text-center">Book a tee time</a>
+                <div class="rounded-2xl bg-cream px-5 pt-5 pb-8">
+                    <div class="flex flex-col gap-3.5 text-sm font-medium uppercase tracking-[0.16em]">
+                        <a href="{{ route('home') }}">Overview</a>
+                        <a href="{{ route('course') }}">The Course</a>
+                        <a href="{{ route('club') }}">The Club</a>
+                        <a href="{{ route('visit') }}">Visit</a>
+                        <a href="{{ route('gallery') }}">Gallery</a>
+                        <a href="{{ route('contact') }}">Contact</a>
+                    </div>
+                    <a href="{{ route('book') }}" class="btn-ink mt-5 w-full">Book a tee time</a>
                 </div>
             </nav>
         </header>
 
         <div class="page-shell">
-            <main class="pb-8">
+            <main class="pt-4 pb-8 sm:pt-2">
                 @yield('content')
             </main>
 

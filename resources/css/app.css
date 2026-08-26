@@ -110,10 +110,11 @@
         justify-content: center;
         background: var(--color-ink);
         color: var(--color-paper);
-        padding: 0.8rem 1.45rem;
+        padding: 0.9rem 1.5rem;
         border-radius: 999px;
         font-size: 0.72rem;
         font-weight: 600;
+        line-height: 1;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         transition: background-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
@@ -125,16 +126,24 @@
         box-shadow: 0 10px 22px rgb(26 25 22 / 0.14);
     }
 
+    .header-book {
+        height: 2.5rem;
+        padding: 0 1rem;
+        white-space: nowrap;
+        letter-spacing: 0.12em;
+    }
+
     .btn-ghost {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         border: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
         color: var(--color-ink);
-        padding: 0.8rem 1.45rem;
+        padding: 0.9rem 1.5rem;
         border-radius: 999px;
         font-size: 0.72rem;
         font-weight: 600;
+        line-height: 1;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         transition: border-color 200ms ease, color 200ms ease, transform 200ms ease, background-color 200ms ease;
@@ -152,10 +161,11 @@
         justify-content: center;
         background: #fff;
         color: var(--color-ink);
-        padding: 0.8rem 1.45rem;
+        padding: 0.9rem 1.5rem;
         border-radius: 999px;
         font-size: 0.72rem;
         font-weight: 600;
+        line-height: 1;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         transition: background-color 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
@@ -200,9 +210,11 @@
     .mobile-nav {
         display: grid;
         grid-template-rows: 0fr;
+        height: 0;
+        overflow: hidden;
         opacity: 0;
         padding-bottom: 0;
-        transition: grid-template-rows 320ms ease, opacity 240ms ease, padding 320ms ease;
+        transition: grid-template-rows 320ms ease, height 320ms ease, opacity 240ms ease, padding 320ms ease;
     }
 
     .mobile-nav > * {
@@ -212,8 +224,9 @@
 
     .mobile-nav.is-open {
         grid-template-rows: 1fr;
+        height: auto;
         opacity: 1;
-        padding-bottom: 1rem;
+        padding-bottom: 1.75rem;
     }
 
     @media (min-width: 1024px) {

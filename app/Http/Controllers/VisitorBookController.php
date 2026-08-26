@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Support\GreenFees;
 use App\Support\TeeSheet;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,42 +18,19 @@ use RuntimeException;
 
 class VisitorBookController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
-        try {
-            $selectedDate = Carbon::parse($request->input('date', now()->toDateString()))->startOfDay();
-        } catch (\Throwable) {
-            $selectedDate = now()->startOfDay();
-        }
+        $sheet = $this->sheet($request);
 
-        $start = now()->startOfDay();
-        $settings = ClubSetting::current();
-        $courses = Course::query()->orderBy('sort_order')->orderBy('name')->get();
-
-        if (! $settings->multiple_courses) {
-            $courses = $courses->take(1);
-        }
-
-        $courseId = $request->integer('course') ?: $courses->first()?->id;
-        if ($courseId && ! $courses->contains('id', $courseId)) {
-            $courseId = $courses->first()?->id;
-        }
-
-        $days = collect(range(0, 13))->map(function (int $offset) use ($start) {
-            $day = $start->copy()->addDays($offset);
-
-            return [
-                'date' => $day->toDateString(),
-                'label' => strtoupper($day->format('D')),
-                'day' => $day->format('j'),
-                'month' => strtoupper($day->format('M')),
-            ];
-        });
-
-        $selected = $selectedDate->toDateString();
-        if (! $days->contains(fn (array $day) => $day['date'] === $selected)) {
-            $selected = now()->toDateString();
-            $selectedDate = now()->startOfDay();
+        if ($request->wantsJson()) {
+            return response()->json([
+                'selected' => $sheet['selected'],
+                'courseId' => $sheet['courseId'],
+                'monthLabel' => $sheet['monthLabel'],
+                'dayRate' => GreenFees::format($sheet['dayRate']),
+                'dayRateLabel' => strtolower($sheet['dayRateLabel']),
+                'slots' => $sheet['slots'],
+            ]);
         }
 
         $error = session('error');
@@ -60,18 +38,7 @@ class VisitorBookController extends Controller
             $error = $error ?: 'Your hold expired and that tee time is available again.';
         }
 
-        return view('pages.book', [
-            'days' => $days,
-            'selected' => $selected,
-            'courses' => $courses,
-            'courseId' => $courseId,
-            'slots' => $courseId ? TeeSheet::visitorSlots($selectedDate, $courseId) : [],
-            'monthLabel' => Carbon::parse($selected)->format('l j F'),
-            'dayRate' => GreenFees::perPlayer($selectedDate),
-            'dayRateLabel' => GreenFees::label($selectedDate),
-            'fees' => GreenFees::table(),
-            'error' => $error,
-        ]);
+        return view('pages.book', [...$sheet, 'error' => $error]);
     }
 
     public function hold(Request $request): RedirectResponse
@@ -220,6 +187,60 @@ class VisitorBookController extends Controller
         return view('pages.book-confirmed', [
             'confirmation' => $confirmation,
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function sheet(Request $request): array
+    {
+        try {
+            $selectedDate = Carbon::parse($request->input('date', now()->toDateString()))->startOfDay();
+        } catch (\Throwable) {
+            $selectedDate = now()->startOfDay();
+        }
+
+        $start = now()->startOfDay();
+        $settings = ClubSetting::current();
+        $courses = Course::query()->orderBy('sort_order')->orderBy('name')->get();
+
+        if (! $settings->multiple_courses) {
+            $courses = $courses->take(1);
+        }
+
+        $courseId = $request->integer('course') ?: $courses->first()?->id;
+        if ($courseId && ! $courses->contains('id', $courseId)) {
+            $courseId = $courses->first()?->id;
+        }
+
+        $days = collect(range(0, 13))->map(function (int $offset) use ($start) {
+            $day = $start->copy()->addDays($offset);
+
+            return [
+                'date' => $day->toDateString(),
+                'label' => strtoupper($day->format('D')),
+                'day' => $day->format('j'),
+                'month' => strtoupper($day->format('M')),
+            ];
+        });
+
+        $selected = $selectedDate->toDateString();
+        if (! $days->contains(fn (array $day) => $day['date'] === $selected)) {
+            $selected = now()->toDateString();
+            $selectedDate = now()->startOfDay();
+        }
+
+        return [
+            'days' => $days,
+            'selected' => $selected,
+            'courses' => $courses,
+            'courseId' => $courseId,
+            'slots' => $courseId ? TeeSheet::visitorSlots($selectedDate, $courseId) : [],
+            'monthLabel' => Carbon::parse($selected)->format('l j F'),
+            'dayRate' => GreenFees::perPlayer($selectedDate),
+            'dayRateLabel' => GreenFees::label($selectedDate),
+            'fees' => GreenFees::table(),
+        ];
     }
 
     private function activeHold(string $token): ?BookingHold

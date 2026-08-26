@@ -83,31 +83,222 @@ function updateTotal() {
     totalLabel.textContent = `£${amount} · ${rate}`;
 }
 
-document.querySelectorAll('.js-pick-slot').forEach((button) => {
-    button.addEventListener('click', () => {
-        const spots = Number(button.dataset.spots || 1);
+function bindSlotButtons(root = document) {
+    root.querySelectorAll('.js-pick-slot').forEach((button) => {
+        button.addEventListener('click', () => {
+            const spots = Number(button.dataset.spots || 1);
 
-        if (courseInput) courseInput.value = button.dataset.courseId || '';
-        if (dateInput) dateInput.value = button.dataset.date || '';
-        if (timeInput) timeInput.value = button.dataset.time || '';
-        if (title) title.textContent = `${button.dataset.time} · ${button.dataset.course}`;
-        if (spotsLabel) spotsLabel.textContent = `${spots} ${spots === 1 ? 'spot' : 'spots'} left on this time.`;
-        if (totalLabel) {
-            totalLabel.dataset.price = button.dataset.price || '0';
-            totalLabel.dataset.fourball = button.dataset.fourball || '';
-            totalLabel.dataset.rateLabel = button.dataset.rateLabel || '';
-        }
+            if (courseInput) courseInput.value = button.dataset.courseId || '';
+            if (dateInput) dateInput.value = button.dataset.date || '';
+            if (timeInput) timeInput.value = button.dataset.time || '';
+            if (title) title.textContent = `${button.dataset.time} · ${button.dataset.course}`;
+            if (spotsLabel) spotsLabel.textContent = `${spots} ${spots === 1 ? 'spot' : 'spots'} left on this time.`;
+            if (totalLabel) {
+                totalLabel.dataset.price = button.dataset.price || '0';
+                totalLabel.dataset.fourball = button.dataset.fourball || '';
+                totalLabel.dataset.rateLabel = button.dataset.rateLabel || '';
+            }
 
-        if (playersSelect) {
-            [...playersSelect.options].forEach((option) => {
-                option.disabled = Number(option.value) > spots;
-            });
-            playersSelect.value = String(Math.min(Number(playersSelect.value || 1), spots));
-            updateTotal();
-        }
+            if (playersSelect) {
+                [...playersSelect.options].forEach((option) => {
+                    option.disabled = Number(option.value) > spots;
+                });
+                playersSelect.value = String(Math.min(Number(playersSelect.value || 1), spots));
+                updateTotal();
+            }
 
-        dialog?.showModal();
+            dialog?.showModal();
+        });
     });
+}
+
+bindSlotButtons();
+
+const bookSheet = document.querySelector('.js-book-sheet');
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+}
+
+function bookUrl(date, course) {
+    const url = new URL(bookSheet?.dataset.url || window.location.pathname, window.location.origin);
+    url.searchParams.set('date', date);
+    if (course) {
+        url.searchParams.set('course', String(course));
+    }
+
+    return `${url.pathname}${url.search}`;
+}
+
+function renderSlots(slots, date) {
+    const grid = bookSheet?.querySelector('.js-book-slots');
+
+    if (!grid) {
+        return;
+    }
+
+    if (!slots.length) {
+        grid.innerHTML = '<div class="card-frame col-span-full p-8 text-ink/65">No visitor times left on this day. Try another date, or telephone the clubhouse.</div>';
+        return;
+    }
+
+    grid.innerHTML = slots.map((slot) => {
+        if (!slot.available) {
+            return `
+                <div class="rounded-[1.5rem] border border-ink/8 bg-paper px-3 py-3 text-ink/35 sm:px-5 sm:py-5">
+                    <p class="font-serif text-2xl sm:text-3xl">${escapeHtml(slot.time)}</p>
+                    <p class="mt-1 font-serif text-lg sm:mt-2 sm:text-xl">${escapeHtml(slot.price_label)}</p>
+                    <p class="mt-1 text-[10px] uppercase tracking-[0.1em] sm:text-[12px] sm:tracking-[0.14em]">Full</p>
+                </div>
+            `;
+        }
+
+        const spots = Number(slot.spots || 0);
+        const spotsWord = spots === 1 ? 'spot' : 'spots';
+
+        return `
+            <button
+                type="button"
+                class="js-pick-slot card-frame p-3 text-left transition hover:bg-[#ebe6d8] sm:p-5"
+                data-course-id="${escapeHtml(slot.course_id)}"
+                data-course="${escapeHtml(slot.course)}"
+                data-date="${escapeHtml(date)}"
+                data-time="${escapeHtml(slot.time)}"
+                data-spots="${escapeHtml(spots)}"
+                data-price="${escapeHtml(slot.price)}"
+                data-price-label="${escapeHtml(slot.price_label)}"
+                data-rate-label="${escapeHtml(slot.rate_label)}"
+                data-fourball="${escapeHtml(slot.fourball ?? '')}"
+            >
+                <p class="font-serif text-2xl sm:text-3xl">${escapeHtml(slot.time)}</p>
+                <p class="mt-1 font-serif text-lg text-ink/80 sm:mt-2 sm:text-xl">${escapeHtml(slot.price_label)}</p>
+                <p class="mt-1 text-[10px] uppercase leading-snug tracking-[0.1em] text-ink/50 sm:text-[12px] sm:tracking-[0.14em]">
+                    <span class="sm:hidden">${spots} ${spotsWord}</span>
+                    <span class="hidden sm:inline">${escapeHtml(slot.rate_label)} · ${spots} ${spotsWord} left</span>
+                </p>
+            </button>
+        `;
+    }).join('');
+
+    bindSlotButtons(grid);
+}
+
+function paintBookSheet(data) {
+    if (!bookSheet) {
+        return;
+    }
+
+    bookSheet.dataset.date = data.selected;
+    bookSheet.dataset.course = String(data.courseId ?? '');
+
+    bookSheet.querySelectorAll('.js-book-day').forEach((day) => {
+        const selected = day.dataset.date === data.selected;
+        day.classList.toggle('bg-ink', selected);
+        day.classList.toggle('text-paper', selected);
+        day.classList.toggle('bg-cream', !selected);
+        day.classList.toggle('text-ink', !selected);
+        day.classList.toggle('hover:bg-cream/70', !selected);
+        day.setAttribute('href', bookUrl(day.dataset.date, data.courseId));
+    });
+
+    bookSheet.querySelectorAll('.js-book-course-tab').forEach((tab) => {
+        const selected = String(tab.dataset.course) === String(data.courseId);
+        tab.classList.toggle('btn-ink', selected);
+        tab.classList.toggle('btn-ghost', !selected);
+        tab.setAttribute('href', bookUrl(data.selected, tab.dataset.course));
+    });
+
+    const month = document.querySelector('.js-book-month');
+    const rate = document.querySelector('.js-book-rate');
+    const rateLabel = document.querySelector('.js-book-rate-label');
+
+    if (month) month.textContent = data.monthLabel || '';
+    if (rate) rate.textContent = data.dayRate || '';
+    if (rateLabel) rateLabel.textContent = data.dayRateLabel || '';
+
+    renderSlots(data.slots || [], data.selected);
+}
+
+let bookRequest = null;
+
+async function loadBookSheet(date, course, { push = true, fallbackHref } = {}) {
+    if (!bookSheet) {
+        return;
+    }
+
+    const url = bookUrl(date, course);
+    bookRequest?.abort();
+    bookRequest = new AbortController();
+
+    bookSheet.classList.add('opacity-60');
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            signal: bookRequest.signal,
+        });
+
+        if (!response.ok) {
+            throw new Error('Could not load tee times');
+        }
+
+        const data = await response.json();
+        paintBookSheet(data);
+
+        if (push) {
+            window.history.pushState({ date: data.selected, course: data.courseId }, '', url);
+        }
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            return;
+        }
+
+        window.location.href = fallbackHref || url;
+    } finally {
+        bookSheet.classList.remove('opacity-60');
+    }
+}
+
+bookSheet?.addEventListener('click', (event) => {
+    const control = event.target.closest('.js-book-day, .js-book-course-tab');
+
+    if (!control || !bookSheet.contains(control)) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const date = control.classList.contains('js-book-day')
+        ? control.dataset.date
+        : bookSheet.dataset.date;
+    const course = control.classList.contains('js-book-course-tab')
+        ? control.dataset.course
+        : bookSheet.dataset.course;
+
+    if (date === bookSheet.dataset.date && String(course) === String(bookSheet.dataset.course)) {
+        return;
+    }
+
+    loadBookSheet(date, course, { fallbackHref: control.href });
+});
+
+window.addEventListener('popstate', () => {
+    if (!bookSheet) {
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    loadBookSheet(
+        params.get('date') || bookSheet.dataset.date,
+        params.get('course') || bookSheet.dataset.course,
+        { push: false },
+    );
 });
 
 playersSelect?.addEventListener('change', updateTotal);

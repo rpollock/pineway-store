@@ -288,8 +288,25 @@
         border: 0;
     }
 
-    .js-book-dialog[open] {
+    .js-gallery-dialog {
+        position: fixed;
+        inset: 0;
+        width: min(72rem, calc(100% - 1.5rem));
+        max-height: calc(100vh - 1.5rem);
+        margin: auto;
+        overflow: hidden;
+        border: 0;
+        padding: 0;
+        background: #11110f;
+        border-radius: 1.25rem;
+    }
+
+    .js-gallery-dialog[open] {
         animation: dialog-in 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .js-gallery-open {
+        cursor: zoom-in;
     }
 
     @keyframes dialog-in {

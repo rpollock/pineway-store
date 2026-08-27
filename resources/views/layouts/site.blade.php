@@ -9,7 +9,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-white text-ink antialiased">
+    <body class="flex min-h-screen flex-col bg-white text-ink antialiased">
         <header class="js-site-header site-header sticky top-0 z-40 bg-white">
             <div class="page-shell flex items-center justify-between gap-3 pt-4 pb-6 sm:gap-6 sm:py-4">
                 <a href="{{ route('home') }}" class="group flex min-w-0 items-center gap-3">
@@ -66,13 +66,15 @@
             </nav>
         </header>
 
-        <div class="page-shell">
+        <div class="page-shell flex-1">
             <main class="pt-4 pb-8 sm:pt-2">
                 @yield('content')
             </main>
+        </div>
 
-            <footer class="mb-6 overflow-hidden rounded-[1.75rem] bg-forest text-paper">
-                <div class="grid gap-10 px-6 py-14 sm:px-8 lg:grid-cols-4 lg:px-12">
+        <footer class="mt-auto overflow-hidden rounded-t-[1.75rem] bg-forest text-paper">
+            <div class="page-shell">
+                <div class="grid gap-10 py-14 lg:grid-cols-4">
                     <div class="lg:col-span-2">
                         <p class="font-serif text-3xl">Wakefield Golf Club</p>
                         <p class="mt-3 max-w-md text-sm leading-relaxed text-paper/70">
@@ -97,11 +99,11 @@
                         <a href="{{ route('book') }}" class="btn-light mt-5">Book a tee time</a>
                     </div>
                 </div>
-                <div class="border-t border-paper/10 px-6 py-5 text-[11px] uppercase tracking-[0.16em] text-paper/45 sm:flex sm:justify-between sm:px-8 lg:px-12">
+                <div class="border-t border-paper/10 py-5 text-[11px] uppercase tracking-[0.16em] text-paper/45 sm:flex sm:justify-between">
                     <p>© {{ date('Y') }} Wakefield Golf Club</p>
                     <p class="mt-2 sm:mt-0">City of Wakefield · West Yorkshire</p>
                 </div>
-            </footer>
-        </div>
+            </div>
+        </footer>
     </body>
 </html>

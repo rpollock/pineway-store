@@ -13,7 +13,15 @@ class ExampleTest extends TestCase
         }
 
         $this->get('/')->assertSee('Book a tee time');
+        $this->get('/the-club')
+            ->assertSee('A short history')
+            ->assertSee('Adam Durie')
+            ->assertSee('Chris Gaunt')
+            ->assertSee('28 Woodthorpe Lane');
         $this->get('/visit')->assertSee('2026 green fees')->assertSee('£60');
+        $this->get('/gallery')
+            ->assertSee('js-gallery-open', false)
+            ->assertSee('Championship parkland, Woodthorpe');
     }
 
     public function test_an_enquiry_can_be_sent(): void

@@ -304,6 +304,64 @@ window.addEventListener('popstate', () => {
 playersSelect?.addEventListener('change', updateTotal);
 closeButton?.addEventListener('click', () => dialog?.close());
 
+const galleryDialog = document.querySelector('.js-gallery-dialog');
+const galleryImage = document.querySelector('.js-gallery-image');
+const galleryCaption = document.querySelector('.js-gallery-caption');
+const galleryItems = [...document.querySelectorAll('.js-gallery-open')];
+let galleryIndex = 0;
+
+function showGallery(index) {
+    const item = galleryItems[index];
+
+    if (! galleryDialog || ! galleryImage || ! item) {
+        return;
+    }
+
+    galleryIndex = (index + galleryItems.length) % galleryItems.length;
+    const current = galleryItems[galleryIndex];
+
+    galleryImage.src = current.dataset.src || '';
+    galleryImage.alt = current.dataset.alt || '';
+
+    if (galleryCaption) {
+        galleryCaption.textContent = current.dataset.caption || '';
+    }
+
+    galleryDialog.showModal();
+}
+
+galleryItems.forEach((item, index) => {
+    item.addEventListener('click', () => showGallery(index));
+});
+
+document.querySelector('.js-gallery-close')?.addEventListener('click', () => galleryDialog?.close());
+document.querySelector('.js-gallery-prev')?.addEventListener('click', () => showGallery(galleryIndex - 1));
+document.querySelector('.js-gallery-next')?.addEventListener('click', () => showGallery(galleryIndex + 1));
+
+galleryDialog?.addEventListener('click', (event) => {
+    if (event.target === galleryDialog) {
+        galleryDialog.close();
+    }
+});
+
+galleryDialog?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+        showGallery(galleryIndex - 1);
+    }
+
+    if (event.key === 'ArrowRight') {
+        showGallery(galleryIndex + 1);
+    }
+});
+
+if (galleryItems.length && window.location.hash.startsWith('#photo-')) {
+    const index = Number(window.location.hash.replace('#photo-', ''));
+
+    if (! Number.isNaN(index)) {
+        showGallery(index);
+    }
+}
+
 const holdTimer = document.querySelector('.js-hold-timer');
 
 if (holdTimer) {

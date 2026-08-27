@@ -101,8 +101,8 @@
             <a href="{{ route('gallery') }}" class="hidden btn-ghost sm:inline-flex">View gallery</a>
         </div>
         <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            @foreach (array_slice($gallery, 0, 4) as $image)
-                <a href="{{ route('gallery') }}" class="group block">
+            @foreach (array_slice($gallery, 0, 4) as $index => $image)
+                <a href="{{ route('gallery') }}#photo-{{ $index }}" class="group block">
                     <div class="media-frame">
                         <img src="{{ asset($image['src']) }}" alt="{{ $image['alt'] }}" class="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-[1.03]">
                     </div>

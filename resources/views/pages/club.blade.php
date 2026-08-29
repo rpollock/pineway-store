@@ -1,8 +1,12 @@
 @extends('layouts.site', ['title' => 'The Club'])
 
+@section('head')
+    <link rel="preload" as="image" href="{{ asset('images/course/wakefield-putting.jpg') }}" fetchpriority="high">
+@endsection
+
 @section('content')
     <section class="hero-frame-short">
-        <img src="{{ asset('images/course/wakefield-putting.jpg') }}" alt="The putting green beside the clubhouse" class="absolute inset-0 h-full w-full object-cover">
+        <img src="{{ asset('images/course/wakefield-putting.jpg') }}" alt="The putting green beside the clubhouse" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-ink/50"></div>
         <div class="relative flex min-h-[52vh] flex-col justify-end px-6 pb-10 sm:px-10 lg:px-14">
             <p class="text-[11px] font-medium uppercase tracking-[0.28em] text-gold">Founded 1891 · Woodthorpe since 1911</p>

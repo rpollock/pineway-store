@@ -21,18 +21,6 @@
         scroll-padding-top: 5.5rem;
     }
 
-    @view-transition {
-        navigation: auto;
-    }
-
-    ::view-transition-old(root) {
-        animation: page-out 220ms ease both;
-    }
-
-    ::view-transition-new(root) {
-        animation: page-in 380ms ease both;
-    }
-
     body {
         font-family: var(--font-sans);
         background: var(--color-paper);
@@ -42,10 +30,6 @@
     @media (prefers-reduced-motion: reduce) {
         html {
             scroll-behavior: auto;
-        }
-
-        @view-transition {
-            navigation: none;
         }
 
         *,
@@ -84,6 +68,7 @@
         overflow: hidden;
         min-height: 72vh;
         border-radius: var(--radius-frame);
+        background: var(--color-ink);
     }
 
     .hero-frame-short {
@@ -91,6 +76,7 @@
         overflow: hidden;
         min-height: 52vh;
         border-radius: var(--radius-frame);
+        background: var(--color-ink);
     }
 
     .media-frame {
@@ -240,15 +226,6 @@
         animation: hero-zoom 22s ease-out forwards;
     }
 
-    .hero-copy > * {
-        animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .hero-copy > *:nth-child(1) { animation-delay: 0.08s; }
-    .hero-copy > *:nth-child(2) { animation-delay: 0.2s; }
-    .hero-copy > *:nth-child(3) { animation-delay: 0.32s; }
-    .hero-copy > *:nth-child(4) { animation-delay: 0.44s; }
-
     html.js-motion .reveal {
         opacity: 0;
         transform: translateY(1.4rem);
@@ -340,22 +317,6 @@
 
         to {
             transform: scale(1);
-        }
-    }
-
-    @keyframes page-out {
-        to {
-            opacity: 0;
-        }
-    }
-
-    @keyframes page-in {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
         }
     }
 }

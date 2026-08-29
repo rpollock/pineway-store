@@ -13,8 +13,6 @@ window.addEventListener('scroll', () => {
     header?.classList.toggle('is-scrolled', window.scrollY > 8);
 }, { passive: true });
 
-document.querySelector('.hero-frame > .relative, .hero-frame-short > .relative')?.classList.add('hero-copy');
-
 document.querySelectorAll('main img').forEach((image) => {
     if (image.closest('.hero-frame, .hero-frame-short, .media-frame')) {
         return;
@@ -28,11 +26,13 @@ document.querySelectorAll('main img').forEach((image) => {
 if (!reduceMotion) {
     document.documentElement.classList.add('js-motion');
 
+    const firstBlock = document.querySelector('main > *');
     const revealables = [
         ...document.querySelectorAll('main > *'),
         document.querySelector('footer'),
     ].filter((element) => (
         element
+        && element !== firstBlock
         && !element.matches('dialog, .hero-frame, .hero-frame-short')
         && !element.querySelector('.js-pick-slot')
     ));

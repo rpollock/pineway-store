@@ -8,6 +8,7 @@
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/mark.svg') }}">
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @yield('head')
     </head>
     <body class="flex min-h-screen flex-col bg-white text-ink antialiased">
         <header class="js-site-header site-header sticky top-0 z-40 bg-white">
@@ -22,7 +23,7 @@
 
                     <nav class="hidden items-center gap-7 text-[12px] font-medium uppercase tracking-[0.18em] text-ink/70 lg:flex">
                         @foreach ([
-                            'home' => 'Overview',
+                            'home' => 'Home',
                             'course' => 'The Course',
                             'club' => 'The Club',
                             'visit' => 'Visit',
@@ -54,7 +55,7 @@
             <nav id="mobile-nav" class="js-mobile-nav mobile-nav page-shell lg:hidden">
                 <div class="rounded-2xl bg-cream px-5 pt-5 pb-8">
                     <div class="flex flex-col gap-3.5 text-sm font-medium uppercase tracking-[0.16em]">
-                        <a href="{{ route('home') }}">Overview</a>
+                        <a href="{{ route('home') }}">Home</a>
                         <a href="{{ route('course') }}">The Course</a>
                         <a href="{{ route('club') }}">The Club</a>
                         <a href="{{ route('visit') }}">Visit</a>

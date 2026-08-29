@@ -1,8 +1,12 @@
 @extends('layouts.site', ['title' => 'The Course'])
 
+@section('head')
+    <link rel="preload" as="image" href="{{ asset('images/course/wakefield-fairway.jpg') }}" fetchpriority="high">
+@endsection
+
 @section('content')
     <section class="hero-frame-short">
-        <img src="{{ asset('images/course/wakefield-fairway.jpg') }}" alt="A tree-lined hole on the Championship course" class="absolute inset-0 h-full w-full object-cover">
+        <img src="{{ asset('images/course/wakefield-fairway.jpg') }}" alt="A tree-lined hole on the Championship course" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-ink/45"></div>
         <div class="relative flex min-h-[52vh] flex-col justify-end px-6 pb-10 sm:px-10 lg:px-14">
             <p class="text-[11px] font-medium uppercase tracking-[0.28em] text-gold">Championship · Par 72 · 6,653 yards</p>

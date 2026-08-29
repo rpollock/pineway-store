@@ -1,8 +1,12 @@
 @extends('layouts.site')
 
+@section('head')
+    <link rel="preload" as="image" href="{{ asset('images/course/wakefield-hero.jpg') }}" fetchpriority="high">
+@endsection
+
 @section('content')
     <section class="hero-frame">
-        <img src="{{ asset('images/course/wakefield-hero.jpg') }}" alt="The Championship parkland at Wakefield Golf Club" class="absolute inset-0 h-full w-full object-cover">
+        <img src="{{ asset('images/course/wakefield-hero.jpg') }}" alt="The Championship parkland at Wakefield Golf Club" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high" decoding="async">
         <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-ink/15"></div>
         <div class="relative flex min-h-[72vh] flex-col justify-end px-6 pb-12 sm:px-10 lg:px-14">
             <p class="text-[11px] font-medium uppercase tracking-[0.32em] text-gold">England · Yorkshire · City of Wakefield</p>
